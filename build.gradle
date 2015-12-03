@@ -25,6 +25,13 @@ sourceSets {
 	}
 }
 
+jar {
+	manifest {
+		attributes 'Created-By': 'Mixpo',
+				   'SCM-Repo': 'git@github.com:Mixpo/bitly-api-client.git'
+	}
+}
+
 // normal repositories and dependencies
 repositories {
 	jcenter()
