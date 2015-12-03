@@ -57,6 +57,12 @@ public abstract class Request<T> {
 	/** contains all query parameters to be added to the request */
 	private List<QueryParameter> queryParameters = new LinkedList<QueryParameter>();
 
+	/** the connect timeout for the underlying URLConnection */
+	private Integer connectTimeout;
+
+	/** the read timeout for the underlying URLConnection */
+	private Integer readTimeout;
+
 	/**
 	 * Constructs a new Request TODO we could consider killing the constructor and instead add a setAccessToken method so the AT would be treated like every
 	 * other query parameter.
@@ -141,6 +147,28 @@ public abstract class Request<T> {
 	}
 
 	/**
+	 * Sets a specified timeout value, in milliseconds, to be used when opening a communications link to the resource.
+	 * @see {@link java.net.URLConnection#setConnectTimeout}
+	 * @param connectionTimeoutMillis
+	 * @return
+	 */
+	public Request<T> setNetworkConnectionTimeout(int connectionTimeoutMillis) {
+		connectTimeout = Integer.valueOf(connectionTimeoutMillis);
+		return this;
+	}
+
+	/**
+	 * Sets the read timeout to a specified timeout in milliseconds.
+	 * @see {@link java.net.URLConnection#setReadTimeout}
+	 * @param readTimeoutMillis
+	 * @return
+	 */
+	public Request<T> setNetworkReadTimeout(int readTimeoutMillis) {
+		readTimeout = Integer.valueOf(readTimeoutMillis);
+		return this;
+	}
+
+	/**
 	 * Build the URL for the call to the API. Subclasses can override this method if they need to add extra parameters or do some other special manipulations
 	 * that this base implementation of URL builder doesn't provide.
 	 * @param queryParameters the QueryParameters
@@ -178,6 +206,12 @@ public abstract class Request<T> {
 			String url = buildUrl();
 			LOG.debug("Calling URL: {}", url);
 			URLConnection conn = new URL(url).openConnection();
+			if(connectTimeout != null) {
+				conn.setConnectTimeout(connectTimeout);
+			}
+			if(readTimeout != null) {
+				conn.setReadTimeout(readTimeout);
+			}
 			conn.connect();
 
 			StringBuffer respBuf = new StringBuffer();
